@@ -32,20 +32,26 @@ public_users.post("/register", (req, res) => {
   return res.status(404).json({ message: "Unable to register user." });
 });
 
+async function getBooks() {
+  // Simulate a delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(books);
+    }, 1000);
+  });
+}
+
 // Get the book list available in the shop
-public_users.get("/", function (req, res) {
+public_users.get("/", async function (req, res) {
   //Write your code here
   // return res.status(200).json(books);
-  const promiseBook = new Promise((resolve, reject) => {
-    resolve(books);
-  }, 1000);
-  promiseBook
-    .then((books) => {
-      res.json(books);
-    })
-    .catch((err) => {
-      res.status(404).json({ error: "Error occur!" });
-    });
+  try {
+    // Use await to wait for the async function to complete
+    const booksData = await getBooks();
+    res.status(200).json(booksData);
+  } catch (err) {
+    res.status(404).json({ error: "No books found." });
+  }
 });
 
 // Get book details based on ISBN
@@ -138,7 +144,7 @@ public_users.get("/title/:title", async function (req, res) {
   };
 
   try {
-    const book = await getBookByTitle(req.params.title);
+    const book = await getBookByTitle(req.params.t);
     res.status(200).json(book);
   } catch (err) {
     res.status(404).json({
